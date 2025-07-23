@@ -2,7 +2,7 @@
 # Sum 10 Game Bot
 
 A Python-based automated game bot that uses computer vision and mouse automation to play grid-based games.
-
+<img src="screenshot.png" alt="App Screenshot" width="200"/>
 ## Overview
 
 This project contains a game bot that can automatically play games by analyzing screenshots and controlling mouse movements. The bot is designed to work with both web-based games and mobile applications (WeChat).
