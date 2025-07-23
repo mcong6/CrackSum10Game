@@ -1,9 +1,9 @@
 import cv2
 import pytesseract
 
-from config import cell_width, cell_center_start_x, cell_center_start_y, board_start_y, board_start_x
+from config import current_config
 from mouse_motion_controller import MouseMotionController
-from solver import solve_board_by_chunks, FindSum10Lazy
+from solver import solve_board_by_chunks, GreedySolver
 from utils import ocr_results_to_arr, show_image, save_screen_shot, transform_matrix
 
 
@@ -116,7 +116,7 @@ class DetectNumbersFromBoard:
     def extract_numbers_from_row_with_empty_cells(self, adaptive_row_image, binary_image, resized_image):
         # Detect horizontal contours for rows
         row = []
-        w = cell_width*2
+        w = current_config.cell_width*2
         for x in range(8, int(w * 10), int(w)):
             binary_cell_image = binary_image[:, x:x + w]
             show_image(binary_cell_image)
@@ -164,7 +164,10 @@ class DetectNumbersFromBoard:
 
 
 def run(matrix=None):
-    region = (board_start_x, board_start_y, cell_width * 10, cell_width * 16 - 1)  # webpage
+    region = (current_config.board_start_x,
+              current_config.board_start_y,
+              current_config.cell_width * 10,
+              current_config.cell_width * 16 - 1)  # webpage
     image_path = 'screenshot.png'
     save_screen_shot(region, image_path)
     if matrix is None:
@@ -178,23 +181,29 @@ def run(matrix=None):
 
     for each_cord in best_operation:
         x1, y1, x2, y2 = each_cord
-        MouseMotionController(cell_center_start_x, cell_center_start_y, cell_width).select_rectangle(x1, y1, x2, y2)
+        MouseMotionController(current_config.cell_center_start_x,
+                              current_config.cell_center_start_y,
+                              current_config.cell_width).select_rectangle(x1, y1, x2, y2)
     print(f"finished one round")
 
     save_screen_shot(region, image_path)
-    matrix = DetectNumbersFromBoard(image_path, board_start_x, board_start_y,
-                                    cell_width).extract_numbers_from_board_with_empty_cell()
+    matrix = DetectNumbersFromBoard(image_path,
+                                    current_config.board_start_x,
+                                    current_config.cell_center_start_y,
+                                    current_config.cell_width).extract_numbers_from_board_with_empty_cell()
     matrix = transform_matrix(matrix)
     print(f"matrix is:")
     for line in matrix:
         print(line)
     print("Start selecting numbers.")
-    solver = FindSum10Lazy(matrix)
-    solver.start_solver()
+    solver = GreedySolver(matrix)
+    solver.solver()
     print(f"Coordination of number combo: {solver.res}")
     for each_cord in solver.res:
         x1, y1, x2, y2 = each_cord
-        MouseMotionController(cell_center_start_x, cell_center_start_y, cell_width).select_rectangle(x1, y1, x2, y2)
+        MouseMotionController(current_config.cell_center_start_x,
+                              current_config.cell_center_start_y,
+                              current_config.cell_width).select_rectangle(x1, y1, x2, y2)
     print(f"finished one round")
 
 
