@@ -164,7 +164,7 @@ class DetectNumbersFromBoard:
 
 
 def run(matrix=None):
-    region = (board_start_x, board_start_y, cell_width * 10, cell_width * 16 - 10)  # webpage
+    region = (board_start_x, board_start_y, cell_width * 10, cell_width * 16 - 1)  # webpage
     image_path = 'screenshot.png'
     save_screen_shot(region, image_path)
     if matrix is None:
